@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-16
+
 ### Added
 
 - The EnergyZero device: current and next hour electricity price, average,
@@ -24,4 +26,5 @@ the notes of the version's GitHub Release.
 - "Refresh the prices now" button in the configuration.
 - English, French, German and Spanish texts and documentation.
 
-[Unreleased]: https://github.com/guim31/gladys-energyzero/commits/main
+[Unreleased]: https://github.com/guim31/gladys-energyzero/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/guim31/gladys-energyzero/releases/tag/v1.0.1
