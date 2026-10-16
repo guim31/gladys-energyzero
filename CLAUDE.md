@@ -31,16 +31,25 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only: src/app.js registers the handlers before connect()
+src/app.js                        refresh cycle (own minute timer, onPoll fallback), states, scene events,
+                                  "refresh" action, widget, config and connection lifecycle
+src/energyzero.js                 client of the public price API (fetch + parsing of the four streams)
+src/market.js                     known prices, refresh policy (hourly, 15 min from 14:00, backoff), snapshot
+src/prices.js                     pure computations: current/next slot, day summary, rank, cheapest window
+src/device.js                     the one device (external id on the market zone "nl") and its states
+src/triggers.js                   scene events fired when an hour begins (manifest `scene_triggers`)
+src/widget.js                     "prices" dashboard widget (manifest `widgets`)
+src/ledger.js                     hours whose scene events are out, kept in /data/scene-events.json
+src/time.js                       Europe/Amsterdam market clock
+src/i18n.js                       feature names and every user-facing text, en/fr/de/es
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
-gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+src/issues.js                     a repeated failure logged once, its recovery once
+scripts/probe.mjs                 reads the real prices of today (run where the network allows)
+gladys-assistant-integration.json manifest: name, config_schema, actions, triggers, widget...
+docs/{en,fr,de,es}.md             user documentation, same sections (test/i18n.test.js)
+test/                             node --test, against the SDK's fake Gladys and a fake API
+test/fixtures/energyzero/         real API answers from python-energyzero (MIT)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,12 +79,34 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German and Spanish: action
+  messages, manifest texts, feature names, widget, and `docs/en.md`, `fr.md`,
+  `de.md`, `es.md`, kept in sync (see « Langues » below).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
 ---
+
+# EnergyZero : API et pièges propres à cette intégration
+
+- **API** : `GET https://public.api.energyzero.nl/public/v1/prices?energyType=ENERGY_TYPE_ELECTRICITY|ENERGY_TYPE_GAS&date=DD-MM-YYYY&interval=INTERVAL_HOUR|INTERVAL_QUARTER|INTERVAL_DAY`,
+  celle de `python-energyzero` v5 (et donc de Home Assistant). L'ancienne `api.energyzero.nl/v1/energyprices`
+  (`inclBtw`, `usageType`) citée dans les vieux exemples n'est plus celle de la bibliothèque : `scripts/probe.mjs`
+  teste les deux. Pas de quota publié ; rester à environ deux requêtes par heure.
+- Une réponse couvre **trois jours de marché** autour de `date` (la veille, le jour, le lendemain s'il est publié),
+  en quatre flux : `base` (marché EPEX, NL), `base_with_vat`, `all_in` (marché + taxe sur l'énergie + frais
+  d'achat), `all_in_with_vat`. Les prix sont des **chaînes décimales**. 404 = rien de publié.
+- Le **gaz** a un prix par journée gazière, **de 6 h à 6 h** (Amsterdam), pas de minuit à minuit.
+- Le jour de marché est celui d'**Europe/Amsterdam** (`src/time.js`), pas le `TZ` de Gladys. Jours de
+  changement d'heure : 23 ou 25 heures (le rang va jusqu'à 25).
+- Prix d'électricité du lendemain publiés **entre 14 h et 15 h** : relève toutes les 15 min à partir de 14 h
+  tant qu'ils manquent.
+- Pas d'unité €/kWh dans Gladys : `currency/decimal` en `euro`, l'unité est dans le nom. Le front arrondit à
+  3 chiffres significatifs (`smartRound`) : 0,239.
+- Déclencheurs : les filtres de scène ne font qu'égalité/appartenance. Pour « les N heures les moins chères »,
+  le champ `hours` est un `select` **obligatoire** et l'intégration envoie un événement par N concerné (sinon un
+  filtre vide ferait tourner la scène plusieurs fois par heure). Pas d'événement pour une heure commencée depuis
+  plus de 10 min ; `/data/scene-events.json` évite le double envoi après un redémarrage.
 
 # Notes du mainteneur (guim31)
 
