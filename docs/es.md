@@ -29,7 +29,7 @@ en Ámsterdam, sea cual sea la zona horaria de su Gladys.
 
 ## Requisitos
 
-- Gladys Assistant 5.1.0 o posterior.
+- Gladys Assistant 5.3.0 o posterior.
 - Acceso a internet desde Gladys hacia `public.api.energyzero.nl`.
 - Nada más: ni cuenta, ni clave de API, ni hardware.
 
