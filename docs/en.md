@@ -27,7 +27,7 @@ Amsterdam, whatever the timezone of your Gladys.
 
 ## Requirements
 
-- Gladys Assistant 5.1.0 or later.
+- Gladys Assistant 5.3.0 or later.
 - Internet access from Gladys to `public.api.energyzero.nl`.
 - Nothing else: no account, no API key, no hardware.
 
