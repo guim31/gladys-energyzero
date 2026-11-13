@@ -31,7 +31,7 @@ its market price is the same EPEX NL market.
 
 ## Requirements
 
-- Gladys Assistant **5.1.0** or later.
+- Gladys Assistant **5.3.0** or later.
 - Internet access from Gladys to `public.api.energyzero.nl`.
 
 ## Installation
