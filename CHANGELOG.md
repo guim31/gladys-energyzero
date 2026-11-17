@@ -10,6 +10,10 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Changed
+
+- SDK 0.16.1 (`@gladysassistant/integration-sdk`).
+
 ## [1.0.2] - 2026-11-13
 
 ### Changed
