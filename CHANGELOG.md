@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-17
+
 ### Changed
 
 - SDK 0.16.1 (`@gladysassistant/integration-sdk`).
@@ -38,6 +40,7 @@ the notes of the version's GitHub Release.
 - "Refresh the prices now" button in the configuration.
 - English, French, German and Spanish texts and documentation.
 
-[Unreleased]: https://github.com/guim31/gladys-energyzero/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/guim31/gladys-energyzero/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/guim31/gladys-energyzero/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/guim31/gladys-energyzero/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/guim31/gladys-energyzero/releases/tag/v1.0.1
